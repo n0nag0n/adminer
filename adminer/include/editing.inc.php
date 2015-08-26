@@ -234,6 +234,7 @@ function type_class($type) {
 */
 function edit_fields($fields, $collations, $type = "TABLE", $foreign_keys = array(), $comments = false) {
 	global $connection, $inout;
+	$fields = array_values($fields);
 	?>
 <thead><tr class="wrap">
 <?php if ($type == "PROCEDURE") { ?><td>&nbsp;<?php } ?>
@@ -522,4 +523,17 @@ function db_size($db) {
 		$return += $table_status["Data_length"] + $table_status["Index_length"];
 	}
 	return format_number($return);
+}
+
+/** Print SET NAMES if utf8mb4 might be needed
+* @param string
+* @return null
+*/
+function set_utf8mb4($create) {
+  global $connection;
+	static $set = false;
+	if (!$set && preg_match('~\butf8mb4~i', $create)) { // possible false positive
+		$set = true;
+		echo "SET NAMES " . charset($connection) . ";\n\n";
+	}
 }
